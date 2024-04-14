@@ -20,6 +20,9 @@
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
     "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "@kitajs/html",
+    "plugins": [{ "name": "@kitajs/ts-html-plugin" }],
     "typeRoots": [
       "./node_modules/@types"
     ]
