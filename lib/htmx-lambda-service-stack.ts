@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { WebAdapterLambda } from './constructs/webAdapterLambda';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export class HtmxLambdaServiceStack extends cdk.Stack {
@@ -12,5 +13,12 @@ export class HtmxLambdaServiceStack extends cdk.Stack {
     // const queue = new sqs.Queue(this, 'HtmxLambdaServiceQueue', {
     //   visibilityTimeout: cdk.Duration.seconds(300)
     // });
+
+    const serviceLambda = new WebAdapterLambda(this, 'WebAdapterLambda', {})
+
+    new cdk.CfnOutput(this, 'FunctionUrl', {
+      description: 'The http url to invoke the service through',
+      value: serviceLambda.url.attrFunctionUrl
+    })
   }
 }
