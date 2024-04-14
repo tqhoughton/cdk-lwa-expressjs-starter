@@ -7,7 +7,7 @@ export interface WebAdapterLambdaProps {
 }
 
 export class WebAdapterLambda extends Construct {
-  public readonly url: lambda.CfnUrl
+  url: lambda.IFunctionUrl
 
   constructor(
     scope: Construct,
@@ -17,6 +17,7 @@ export class WebAdapterLambda extends Construct {
     super(scope, id);
     
     const webAdapterFn = new lambda.DockerImageFunction(this, "DockerImageLambda", {
+      functionName: "htmx-lambda-service",
       memorySize: 256,
       environment: {
         RUST_LOG: "info",
@@ -25,10 +26,9 @@ export class WebAdapterLambda extends Construct {
       code: lambda.DockerImageCode.fromImageAsset(path.resolve(__dirname, "../../app"))
     })
 
-    this.url = new lambda.CfnUrl(this, "DockerImageLambdaUrl", {
-      targetFunctionArn: webAdapterFn.functionArn,
-      authType: 'NONE',
-      invokeMode: 'RESPONSE_STREAM'
+    this.url = webAdapterFn.addFunctionUrl({
+      authType: lambda.FunctionUrlAuthType.NONE,
+      invokeMode: lambda.InvokeMode.RESPONSE_STREAM
     })
   }
 }

@@ -18,7 +18,7 @@ export class HtmxLambdaServiceStack extends cdk.Stack {
 
     new cdk.CfnOutput(this, 'FunctionUrl', {
       description: 'The http url to invoke the service through',
-      value: serviceLambda.url.attrFunctionUrl
+      value: serviceLambda.url.url
     })
   }
 }
