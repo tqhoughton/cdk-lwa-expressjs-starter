@@ -1,5 +1,5 @@
 import http from 'node:http';
-// import express from 'express'
+import express from 'express'
 import { setTimeout } from 'node:timers/promises';
 import Html, { type PropsWithChildren } from '@kitajs/html'
 import { Suspense, renderToStream } from '@kitajs/html/suspense';
@@ -12,6 +12,9 @@ async function SleepForMs({ ms, children }: PropsWithChildren<{ ms: number }>) {
 function renderLayout(rid: number | string) {
   return (
     <html>
+      <head>
+        <title>Cool HTMX website!</title>
+      </head>
       <div>
         {Array.from({ length: 5 }, (_, i) => (
           <Suspense rid={rid} fallback={<div>{i} FIuter</div>}>
@@ -31,55 +34,33 @@ function renderLayout(rid: number | string) {
   );
 }
 
-// const app = express()
-// const port = process.env['PORT'] || 8080
+const app = express()
+const port = process.env['PORT'] || 8080
 
 // SIGTERM Handler
 process.on('SIGTERM', async () => {
-    console.info('[express] SIGTERM received');
+  console.info('[express] SIGTERM received');
 
-    console.info('[express] cleaning up');
-    // perform actual clean up work here.
-    await setTimeout(100);
+  console.info('[express] cleaning up');
+  // perform actual clean up work here.
+  await setTimeout(100);
 
-    console.info('[express] exiting');
-    process.exit(0)
+  console.info('[express] exiting');
+  process.exit(0)
 });
 
-// TODO: get expressjs working
+app.get('/', (_, res) => {
+  // ⚠️ Charset utf8 is important to avoid old browsers utf7 xss attacks
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
 
-// app.get('/', (_, res) => {
-//     // ⚠️ Charset utf8 is important to avoid old browsers utf7 xss attacks
-//     res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  // Creates the html stream
+  const htmlStream = renderToStream(renderLayout);
 
-//     // Creates the html stream
-//     const htmlStream = renderToStream(renderLayout);
+  // Pipes it into the response
+  res.type('text/html; charset=utf-8')
+  htmlStream.pipe(res);
+})
 
-//     // Pipes it into the response
-//     htmlStream.pipe(res);
-
-//     res.type('text/html; charset=utf-8').send(htmlStream);
-// })
-
-// app.listen(port, () => {
-//     console.log(`Example app listening at http://localhost:${port}`)
-// })
-
-// copied from suspense example
-http
-  .createServer((req, response) => {
-    // ⚠️ Charset utf8 is important to avoid old browsers utf7 xss attacks
-    response.setHeader('Content-Type', 'text/html; charset=utf-8');
-
-    // Creates the html stream
-    const htmlStream = renderToStream(renderLayout);
-
-    // Pipes it into the response
-    htmlStream.pipe(response);
-
-    // If its an express or fastify server, just use
-    // response.type('text/html; charset=utf-8').send(htmlStream);
-  })
-  .listen(8080, () => {
-    console.log('Listening to http://localhost:8080');
-  });
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`)
+})

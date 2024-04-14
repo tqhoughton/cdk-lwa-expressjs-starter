@@ -5,7 +5,7 @@
     "htmx-lambda-service": "bin/htmx-lambda-service.js"
   },
   "scripts": {
-    "start": "nodemon ./dist/index.js",
+    "start": "tsc -w --project ./tsconfig.build.json & nodemon ./dist/index.js",
     "build": "tsc --build ./tsconfig.build.json",
     "predeploy": "npm run build",
     "synth": "cdk synth",
