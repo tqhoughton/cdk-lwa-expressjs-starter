@@ -24,7 +24,7 @@ export class WebAdapterLambda extends Construct {
         RUST_LOG: "info",
         AWS_LWA_INVOKE_MODE: "response_stream"
       },
-      code: lambda.DockerImageCode.fromImageAsset(path.resolve(__dirname, "../../app"))
+      code: lambda.DockerImageCode.fromImageAsset(path.resolve(__dirname, "../../"))
     })
 
     this.url = webAdapterFn.addFunctionUrl({
