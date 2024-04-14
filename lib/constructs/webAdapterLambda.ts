@@ -18,6 +18,7 @@ export class WebAdapterLambda extends Construct {
     
     const webAdapterFn = new lambda.DockerImageFunction(this, "DockerImageLambda", {
       functionName: "htmx-lambda-service",
+      architecture: lambda.Architecture.ARM_64,
       memorySize: 256,
       environment: {
         RUST_LOG: "info",
