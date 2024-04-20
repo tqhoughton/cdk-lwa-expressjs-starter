@@ -1,24 +1,26 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { WebAdapterLambda } from './constructs/webAdapterLambda';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+
+export interface HtmxLambdaServiceStackProps extends cdk.StackProps {
+  oidc: {
+    ISSUER_BASE_URL: string
+    CLIENT_ID: string
+    SECRET: string
+  }
+}
 
 export class HtmxLambdaServiceStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props: HtmxLambdaServiceStackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
-
-    // example resource
-    // const queue = new sqs.Queue(this, 'HtmxLambdaServiceQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
-
-    const serviceLambda = new WebAdapterLambda(this, 'WebAdapterLambda', {})
+    const serviceLambda = new WebAdapterLambda(this, 'WebAdapterLambda', {
+      env: props.oidc
+    });
 
     new cdk.CfnOutput(this, 'FunctionUrl', {
       description: 'The http url to invoke the service through',
-      value: serviceLambda.url.url
-    })
+      value: serviceLambda.fnUrl.url
+    });
   }
 }

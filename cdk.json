@@ -1,5 +1,6 @@
 {
   "app": "npx ts-node --prefer-ts-exts bin/htmx-lambda-service.ts",
+  "profile": "personal",
   "watch": {
     "include": [
       "**"

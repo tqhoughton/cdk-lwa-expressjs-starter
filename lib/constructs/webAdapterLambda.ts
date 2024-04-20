@@ -4,11 +4,11 @@ import * as cdk from "aws-cdk-lib"
 import path from "path"
 
 export interface WebAdapterLambdaProps {
-  
+  env: lambda.FunctionProps['environment']
 }
 
 export class WebAdapterLambda extends Construct {
-  url: lambda.IFunctionUrl
+  fnUrl: lambda.IFunctionUrl
 
   constructor(
     scope: Construct,
@@ -23,15 +23,16 @@ export class WebAdapterLambda extends Construct {
       architecture: lambda.Architecture.ARM_64,
       memorySize: 256,
       environment: {
+        ...props.env,
         RUST_LOG: "info",
         AWS_LWA_INVOKE_MODE: "response_stream"
       },
       code: lambda.DockerImageCode.fromImageAsset(path.resolve(__dirname, "../../"))
-    })
+    });
 
-    this.url = webAdapterFn.addFunctionUrl({
+    this.fnUrl = webAdapterFn.addFunctionUrl({
       authType: lambda.FunctionUrlAuthType.NONE,
       invokeMode: lambda.InvokeMode.RESPONSE_STREAM
-    })
+    });
   }
 }

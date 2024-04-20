@@ -1,8 +1,11 @@
-import http from 'node:http';
-import express from 'express'
+import express from 'express';
 import { setTimeout } from 'node:timers/promises';
-import Html, { type PropsWithChildren } from '@kitajs/html'
+import Html, { type PropsWithChildren } from '@kitajs/html';
 import { Suspense, renderToStream } from '@kitajs/html/suspense';
+import { auth } from 'express-openid-connect';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 async function SleepForMs({ ms, children }: PropsWithChildren<{ ms: number }>) {
   await setTimeout(ms * 2);
@@ -34,22 +37,28 @@ function renderLayout(rid: number | string) {
   );
 }
 
-const app = express()
-const port = process.env['PORT'] || 8080
+const app = express();
+const port = process.env['PORT'] || 8080;
+
+app.use((req, res, next) => {
+  // for some reason https not detected in LWA apps
+  const baseURL = `${process.env.LAMBDA_TASK_ROOT ? 'https' : req.protocol}://${req.header('x-forwarded-host') || req.get('host')}`;
+  console.log('url: ', baseURL)
+  return auth({
+    baseURL
+  })(req, res, next);
+});
 
 // SIGTERM Handler
 process.on('SIGTERM', async () => {
   console.info('[express] SIGTERM received');
-
   console.info('[express] cleaning up');
-  // perform actual clean up work here.
-  await setTimeout(100);
-
+  // Add any necessary cleanup here
   console.info('[express] exiting');
-  process.exit(0)
+  process.exit(0);
 });
 
-app.get('/', (_, res) => {
+app.get('/', (_req, res) => {
   // ⚠️ Charset utf8 is important to avoid old browsers utf7 xss attacks
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
 
@@ -59,8 +68,8 @@ app.get('/', (_, res) => {
   // Pipes it into the response
   res.type('text/html; charset=utf-8')
   htmlStream.pipe(res);
-})
+});
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
-})
+  console.log(`Example app listening at http://localhost:${port}`);
+});
