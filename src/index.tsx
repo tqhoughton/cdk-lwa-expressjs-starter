@@ -18,7 +18,9 @@ function renderLayout(rid: number | string) {
       <head>
         <title>Cool HTMX website!</title>
       </head>
-      <div>
+      <body>
+        <img src="/assets/spongebob.webp" />
+        <div>
         {Array.from({ length: 5 }, (_, i) => (
           <Suspense rid={rid} fallback={<div>{i} FIuter</div>}>
             <div>Outer {i}!</div>
@@ -33,6 +35,7 @@ function renderLayout(rid: number | string) {
           </Suspense>
         ))}
       </div>
+      </body>
     </html>
   );
 }
@@ -57,6 +60,8 @@ process.on('SIGTERM', async () => {
   console.info('[express] exiting');
   process.exit(0);
 });
+
+app.use('/assets', express.static('public'))
 
 app.get('/', (_req, res) => {
   // ⚠️ Charset utf8 is important to avoid old browsers utf7 xss attacks
